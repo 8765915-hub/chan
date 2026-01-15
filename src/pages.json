@@ -7,6 +7,12 @@
 			}
 		},
 		{
+			"path": "pages/report/report",
+			"style": {
+				"navigationBarTitleText": "上报粪便"
+			}
+		},
+		{
 			"path": "pages/rank/rank",
 			"style": {
 				"navigationBarTitleText": "积分榜"
@@ -39,7 +45,7 @@
 		"list": [
 			{
 				"pagePath": "pages/index/index",
-				"text": "上报",
+				"text": "发现",
 				"iconPath": "static/tabbar/report.png",
 				"selectedIconPath": "static/tabbar/report_active.png"
 			},

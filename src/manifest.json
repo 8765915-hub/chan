@@ -44,14 +44,12 @@
     },
     "quickapp" : {},
     "mp-weixin" : {
-        "appid" : "",
+        "appid" : "wxddf493599e25cf44",
         "setting" : {
             "urlCheck" : false
         },
         "usingComponents" : true,
-        "requiredPrivateInfos": [
-            "getLocation"
-        ],
+        "requiredPrivateInfos" : [ "getLocation" ],
         "permission" : {
             "scope.userLocation" : {
                 "desc" : "您的位置信息将用于记录上报地点"
