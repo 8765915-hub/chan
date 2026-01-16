@@ -9,7 +9,7 @@ const CompressionPlugin = require('compression-webpack-plugin')
 
 const name = process.env.VUE_APP_TITLE || '若依管理系统' // 网页标题
 
-const baseUrl = 'http://localhost:8080' // 后端接口
+// const baseUrl = 'http://localhost:8080' // 后端接口
 
 const port = process.env.port || process.env.npm_config_port || 80 // 端口
 
@@ -29,27 +29,27 @@ module.exports = {
   productionSourceMap: false,
   transpileDependencies: ['quill'],
   // webpack-dev-server 相关配置
-  devServer: {
-    host: '0.0.0.0',
-    port: port,
-    open: true,
-    proxy: {
-      // detail: https://cli.vuejs.org/config/#devserver-proxy
-      [process.env.VUE_APP_BASE_API]: {
-        target: baseUrl,
-        changeOrigin: true,
-        pathRewrite: {
-          ['^' + process.env.VUE_APP_BASE_API]: ''
-        }
-      },
-      // springdoc proxy
-      '^/v3/api-docs/(.*)': {
-        target: baseUrl,
-        changeOrigin: true
-      }
-    },
-    disableHostCheck: true
-  },
+  // devServer: {
+  //   host: '0.0.0.0',
+  //   port: port,
+  //   open: true,
+  //   proxy: {
+  //     // detail: https://cli.vuejs.org/config/#devserver-proxy
+  //     [process.env.VUE_APP_BASE_API]: {
+  //       target: baseUrl,
+  //       changeOrigin: true,
+  //       pathRewrite: {
+  //         ['^' + process.env.VUE_APP_BASE_API]: ''
+  //       }
+  //     },
+  //     // springdoc proxy
+  //     '^/v3/api-docs/(.*)': {
+  //       target: baseUrl,
+  //       changeOrigin: true
+  //     }
+  //   },
+  //   disableHostCheck: true
+  // },
   css: {
     loaderOptions: {
       sass: {

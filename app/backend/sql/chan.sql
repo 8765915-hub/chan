@@ -11,7 +11,7 @@
  Target Server Version : 80026 (8.0.26)
  File Encoding         : 65001
 
- Date: 15/01/2026 17:53:40
+ Date: 16/01/2026 17:19:15
 */
 
 SET NAMES utf8mb4;
@@ -89,11 +89,12 @@ CREATE TABLE `gen_table`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`table_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '代码生成业务表' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '代码生成业务表' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of gen_table
 -- ----------------------------
+INSERT INTO `gen_table` VALUES (1, 'bus_report', '上报记录表', NULL, NULL, 'BusReport', 'crud', '', 'com.ruoyi.system', 'system', 'report', '上报记录', 'ruoyi', '0', '/', NULL, 'admin', '2026-01-16 15:58:22', '', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for gen_table_column
@@ -123,11 +124,23 @@ CREATE TABLE `gen_table_column`  (
   `update_by` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`column_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '代码生成业务表字段' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '代码生成业务表字段' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of gen_table_column
 -- ----------------------------
+INSERT INTO `gen_table_column` VALUES (1, 1, 'id', '主键', 'bigint', 'Long', 'id', '1', '1', '0', '1', NULL, NULL, NULL, 'EQ', 'input', '', 1, 'admin', '2026-01-16 15:58:22', '', NULL);
+INSERT INTO `gen_table_column` VALUES (2, 1, 'description', '描述', 'varchar(500)', 'String', 'description', '0', '0', '0', '1', '1', '1', '1', 'EQ', 'textarea', '', 2, 'admin', '2026-01-16 15:58:22', '', NULL);
+INSERT INTO `gen_table_column` VALUES (3, 1, 'images', '图片地址，逗号分隔', 'varchar(2000)', 'String', 'images', '0', '0', '0', '1', '1', '1', '1', 'EQ', 'textarea', '', 3, 'admin', '2026-01-16 15:58:22', '', NULL);
+INSERT INTO `gen_table_column` VALUES (4, 1, 'latitude', '纬度', 'decimal(10,7)', 'BigDecimal', 'latitude', '0', '0', '0', '1', '1', '1', '1', 'EQ', 'input', '', 4, 'admin', '2026-01-16 15:58:22', '', NULL);
+INSERT INTO `gen_table_column` VALUES (5, 1, 'longitude', '经度', 'decimal(10,7)', 'BigDecimal', 'longitude', '0', '0', '0', '1', '1', '1', '1', 'EQ', 'input', '', 5, 'admin', '2026-01-16 15:58:22', '', NULL);
+INSERT INTO `gen_table_column` VALUES (6, 1, 'address', '详细地址', 'varchar(255)', 'String', 'address', '0', '0', '0', '1', '1', '1', '1', 'EQ', 'input', '', 6, 'admin', '2026-01-16 15:58:22', '', NULL);
+INSERT INTO `gen_table_column` VALUES (7, 1, 'status', '状态（0待清理 1已清理）', 'char(1)', 'String', 'status', '0', '0', '0', '1', '1', '1', '1', 'EQ', 'radio', '', 7, 'admin', '2026-01-16 15:58:22', '', NULL);
+INSERT INTO `gen_table_column` VALUES (8, 1, 'create_by', '创建者', 'varchar(64)', 'String', 'createBy', '0', '0', '0', '1', NULL, NULL, NULL, 'EQ', 'input', '', 8, 'admin', '2026-01-16 15:58:22', '', NULL);
+INSERT INTO `gen_table_column` VALUES (9, 1, 'create_time', '创建时间', 'datetime', 'Date', 'createTime', '0', '0', '0', '1', NULL, NULL, NULL, 'EQ', 'datetime', '', 9, 'admin', '2026-01-16 15:58:22', '', NULL);
+INSERT INTO `gen_table_column` VALUES (10, 1, 'update_by', '更新者', 'varchar(64)', 'String', 'updateBy', '0', '0', '0', '1', '1', NULL, NULL, 'EQ', 'input', '', 10, 'admin', '2026-01-16 15:58:22', '', NULL);
+INSERT INTO `gen_table_column` VALUES (11, 1, 'update_time', '更新时间', 'datetime', 'Date', 'updateTime', '0', '0', '0', '1', '1', NULL, NULL, 'EQ', 'datetime', '', 11, 'admin', '2026-01-16 15:58:22', '', NULL);
+INSERT INTO `gen_table_column` VALUES (12, 1, 'remark', '备注', 'varchar(500)', 'String', 'remark', '0', '0', '0', '1', '1', '1', NULL, 'EQ', 'textarea', '', 12, 'admin', '2026-01-16 15:58:22', '', NULL);
 
 -- ----------------------------
 -- Table structure for qrtz_blob_triggers
@@ -564,7 +577,7 @@ CREATE TABLE `sys_logininfor`  (
   PRIMARY KEY (`info_id`) USING BTREE,
   INDEX `idx_sys_logininfor_s`(`status` ASC) USING BTREE,
   INDEX `idx_sys_logininfor_lt`(`login_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 111 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '系统访问记录' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 114 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '系统访问记录' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of sys_logininfor
@@ -580,6 +593,9 @@ INSERT INTO `sys_logininfor` VALUES (107, 'admin', '127.0.0.1', '内网IP', 'WeC
 INSERT INTO `sys_logininfor` VALUES (108, 'admin', '192.168.0.236', '内网IP', 'WeChat 8.0.67', 'iOS 18.7', '0', '登录成功', '2026-01-15 17:26:38');
 INSERT INTO `sys_logininfor` VALUES (109, 'admin', '192.168.0.35', '内网IP', 'WeChat 8.0.5', 'iOS 15.0', '0', '登录成功', '2026-01-15 17:37:18');
 INSERT INTO `sys_logininfor` VALUES (110, 'admin', '192.168.0.35', '内网IP', 'WeChat 8.0.5', 'iOS 15.0', '0', '登录成功', '2026-01-15 17:40:02');
+INSERT INTO `sys_logininfor` VALUES (111, 'admin', '192.168.0.236', '内网IP', 'WeChat 8.0.67', 'iOS 18.7', '0', '登录成功', '2026-01-15 17:57:37');
+INSERT INTO `sys_logininfor` VALUES (112, 'admin', '127.0.0.1', '内网IP', 'Chrome 143', 'Windows10', '0', '登录成功', '2026-01-16 15:57:12');
+INSERT INTO `sys_logininfor` VALUES (113, 'admin', '127.0.0.1', '内网IP', 'Chrome 143', 'Windows10', '0', '登录成功', '2026-01-16 15:58:00');
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -607,7 +623,7 @@ CREATE TABLE `sys_menu`  (
   `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`menu_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2000 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '菜单权限表' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 2006 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '菜单权限表' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of sys_menu
@@ -697,6 +713,12 @@ INSERT INTO `sys_menu` VALUES (1057, '生成删除', 116, 3, '#', '', '', '', 1,
 INSERT INTO `sys_menu` VALUES (1058, '导入代码', 116, 4, '#', '', '', '', 1, 0, 'F', '0', '0', 'tool:gen:import', '#', 'admin', '2026-01-15 16:11:35', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (1059, '预览代码', 116, 5, '#', '', '', '', 1, 0, 'F', '0', '0', 'tool:gen:preview', '#', 'admin', '2026-01-15 16:11:35', '', NULL, '');
 INSERT INTO `sys_menu` VALUES (1060, '生成代码', 116, 6, '#', '', '', '', 1, 0, 'F', '0', '0', 'tool:gen:code', '#', 'admin', '2026-01-15 16:11:35', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2000, '上报记录', 1, 1, 'report', 'system/report/index', NULL, '', 1, 0, 'C', '0', '0', 'system:report:list', 'form', 'admin', '2026-01-16 16:07:45', '', NULL, '上报记录菜单');
+INSERT INTO `sys_menu` VALUES (2001, '上报查询', 2000, 1, '#', '', NULL, '', 1, 0, 'F', '0', '0', 'system:report:query', '#', 'admin', '2026-01-16 16:07:45', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2002, '上报新增', 2000, 2, '#', '', NULL, '', 1, 0, 'F', '0', '0', 'system:report:add', '#', 'admin', '2026-01-16 16:07:45', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2003, '上报修改', 2000, 3, '#', '', NULL, '', 1, 0, 'F', '0', '0', 'system:report:edit', '#', 'admin', '2026-01-16 16:07:45', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2004, '上报删除', 2000, 4, '#', '', NULL, '', 1, 0, 'F', '0', '0', 'system:report:remove', '#', 'admin', '2026-01-16 16:07:45', '', NULL, '');
+INSERT INTO `sys_menu` VALUES (2005, '上报导出', 2000, 5, '#', '', NULL, '', 1, 0, 'F', '0', '0', 'system:report:export', '#', 'admin', '2026-01-16 16:07:45', '', NULL, '');
 
 -- ----------------------------
 -- Table structure for sys_notice
@@ -748,12 +770,17 @@ CREATE TABLE `sys_oper_log`  (
   INDEX `idx_sys_oper_log_bt`(`business_type` ASC) USING BTREE,
   INDEX `idx_sys_oper_log_s`(`status` ASC) USING BTREE,
   INDEX `idx_sys_oper_log_ot`(`oper_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 101 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '操作日志记录' ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 106 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '操作日志记录' ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of sys_oper_log
 -- ----------------------------
 INSERT INTO `sys_oper_log` VALUES (100, '上报记录', 1, 'com.ruoyi.web.controller.system.BusReportController.add()', 'POST', 1, 'admin', '研发部门', '/system/report', '127.0.0.1', '内网IP', '{\"address\":\"Lat: 34.2226, Lng: 108.9488\",\"createBy\":\"admin\",\"createTime\":\"2026-01-15 16:34:17\",\"description\":\"捡到一块屎\",\"id\":3,\"images\":\"http://localhost:8080/profile/upload/2026/01/15/VPREwYahAzJl0d334887d4466bf0d2cfac1ffee5cf42_20260115163417A001.png,http://localhost:8080/profile/upload/2026/01/15/3B9etMjeVbuw69ace8c1122bd5c724c015098ed65a95_20260115163417A002.png,http://localhost:8080/profile/upload/2026/01/15/9EOMOOXUIz6a9be6b99472d0d91135ce6911c77cd896_20260115163417A003.png\",\"latitude\":34.22259,\"longitude\":108.94878,\"params\":{},\"status\":\"0\"} ', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-01-15 16:34:18', 163);
+INSERT INTO `sys_oper_log` VALUES (101, '代码生成', 6, 'com.ruoyi.generator.controller.GenController.importTableSave()', 'POST', 1, 'admin', '研发部门', '/tool/gen/importTable', '127.0.0.1', '内网IP', '{\"tables\":\"bus_report\"}', '{\"msg\":\"操作成功\",\"code\":200}', 0, NULL, '2026-01-16 15:58:23', 712);
+INSERT INTO `sys_oper_log` VALUES (102, '代码生成', 8, 'com.ruoyi.generator.controller.GenController.batchGenCode()', 'GET', 1, 'admin', '研发部门', '/tool/gen/batchGenCode', '127.0.0.1', '内网IP', '{\"tables\":\"bus_report\"}', NULL, 0, NULL, '2026-01-16 15:58:38', 1728);
+INSERT INTO `sys_oper_log` VALUES (103, '代码生成', 8, 'com.ruoyi.generator.controller.GenController.batchGenCode()', 'GET', 1, 'admin', '研发部门', '/tool/gen/batchGenCode', '127.0.0.1', '内网IP', '{\"tables\":\"bus_report\"}', NULL, 0, NULL, '2026-01-16 15:58:46', 221);
+INSERT INTO `sys_oper_log` VALUES (104, '代码生成', 8, 'com.ruoyi.generator.controller.GenController.batchGenCode()', 'GET', 1, 'admin', '研发部门', '/tool/gen/batchGenCode', '127.0.0.1', '内网IP', '{\"tables\":\"bus_report\"}', NULL, 0, NULL, '2026-01-16 15:59:42', 325);
+INSERT INTO `sys_oper_log` VALUES (105, '代码生成', 8, 'com.ruoyi.generator.controller.GenController.batchGenCode()', 'GET', 1, 'admin', '研发部门', '/tool/gen/batchGenCode', '127.0.0.1', '内网IP', '{\"tables\":\"bus_report\"}', NULL, 0, NULL, '2026-01-16 15:59:43', 244);
 
 -- ----------------------------
 -- Table structure for sys_post
@@ -957,7 +984,7 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 103, 'admin', '若依', '00', 'ry@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '192.168.0.35', '2026-01-15 17:40:01', '2026-01-15 16:11:35', 'admin', '2026-01-15 16:11:35', '', '2026-01-15 16:34:18', '管理员', 10);
+INSERT INTO `sys_user` VALUES (1, 103, 'admin', '若依', '00', 'ry@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', '2026-01-16 15:58:00', '2026-01-15 16:11:35', 'admin', '2026-01-15 16:11:35', '', '2026-01-15 16:34:18', '管理员', 10);
 INSERT INTO `sys_user` VALUES (2, 105, 'ry', '若依', '00', 'ry@qq.com', '15666666666', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', '2026-01-15 16:11:35', '2026-01-15 16:11:35', 'admin', '2026-01-15 16:11:35', '', NULL, '测试员', 0);
 
 -- ----------------------------

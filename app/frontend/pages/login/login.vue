@@ -2,7 +2,7 @@
   <view class="container login-page">
     <view class="logo-box">
       <image src="/static/logo.png" mode="widthFix" class="logo"></image>
-      <text class="title">铲一铲</text>
+      <text class="title">铲泡屎</text>
     </view>
     <button type="primary" class="login-btn" @click="doLogin">微信一键登录</button>
     <button type="default" class="cancel-btn" @click="goBack">暂不登录</button>

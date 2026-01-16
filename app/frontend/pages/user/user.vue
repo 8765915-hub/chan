@@ -39,8 +39,12 @@
         <text>积分兑换</text>
         <text class="arrow">›</text>
       </view>
-      <view class="menu-item" @click="navigateTo('about')">
+      <view class="menu-item" @click="navigateTo('/pages/user/about')">
         <text>关于我们</text>
+        <text class="arrow">›</text>
+      </view>
+      <view class="menu-item" @click="navigateTo('/pages/user/privacy')">
+        <text>用户隐私及服务内容</text>
         <text class="arrow">›</text>
       </view>
     </view>
@@ -89,7 +93,18 @@ const changeAvatar = () => {
 }
 
 const navigateTo = (path) => {
-  uni.showToast({ title: '功能开发中...', icon: 'none' })
+  if (path === 'shop') {
+     uni.showToast({ title: '功能开发中...', icon: 'none' })
+     return
+  }
+  
+  if (path === 'record') {
+    path = '/pages/user/record'
+  }
+  
+  uni.navigateTo({
+    url: path
+  })
 }
 </script>
 

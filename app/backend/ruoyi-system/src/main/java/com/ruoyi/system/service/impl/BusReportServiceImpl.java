@@ -59,25 +59,11 @@ public class BusReportServiceImpl implements IBusReportService
     public int insertBusReport(BusReport busReport)
     {
         busReport.setCreateTime(DateUtils.getNowDate());
-        int rows = busReportMapper.insertBusReport(busReport);
-        
-        // 增加积分逻辑：上报成功 +10 积分
-        if (rows > 0) {
-            try {
-                Long userId = SecurityUtils.getUserId();
-                SysUser user = userMapper.selectUserById(userId);
-                if (user != null) {
-                    Long currentPoints = user.getPoints() == null ? 0L : user.getPoints();
-                    user.setPoints(currentPoints + 10);
-                    userMapper.updateUser(user);
-                }
-            } catch (Exception e) {
-                // 记录日志或忽略，不影响上报主流程
-                e.printStackTrace();
-            }
+        // 初始状态为0（待审核）
+        if (busReport.getStatus() == null) {
+            busReport.setStatus("0");
         }
-        
-        return rows;
+        return busReportMapper.insertBusReport(busReport);
     }
 
     /**
@@ -89,6 +75,26 @@ public class BusReportServiceImpl implements IBusReportService
     @Override
     public int updateBusReport(BusReport busReport)
     {
+        // 审核逻辑：如果状态变更为"1"（已审核/已清理），则给用户加积分
+        // 获取旧数据
+        BusReport oldReport = busReportMapper.selectBusReportById(busReport.getId());
+        if (oldReport != null && busReport.getStatus() != null) {
+            // 如果旧状态不是1，新状态是1，说明是审核通过
+            if (!"1".equals(oldReport.getStatus()) && "1".equals(busReport.getStatus())) {
+                try {
+                    String username = oldReport.getCreateBy();
+                    SysUser user = userMapper.selectUserByUserName(username);
+                    if (user != null) {
+                        Long currentPoints = user.getPoints() == null ? 0L : user.getPoints();
+                        user.setPoints(currentPoints + 10);
+                        userMapper.updateUser(user);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
         busReport.setUpdateTime(DateUtils.getNowDate());
         return busReportMapper.updateBusReport(busReport);
     }

@@ -3,7 +3,7 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "铲一铲"
+				"navigationBarTitleText": "铲泡屎"
 			}
 		},
 		{
@@ -29,11 +29,29 @@
 			"style": {
 				"navigationBarTitleText": "登录"
 			}
+		},
+		{
+			"path": "pages/user/record",
+			"style": {
+				"navigationBarTitleText": "积分记录"
+			}
+		},
+		{
+			"path": "pages/user/about",
+			"style": {
+				"navigationBarTitleText": "关于我们"
+			}
+		},
+		{
+			"path": "pages/user/privacy",
+			"style": {
+				"navigationBarTitleText": "用户隐私及服务内容"
+			}
 		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "铲一铲",
+		"navigationBarTitleText": "铲泡屎",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
 	},

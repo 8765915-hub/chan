@@ -16,7 +16,7 @@
         当前位置: {{ locationStore.address }}
       </view>
       <button class="scoop-btn" hover-class="btn-hover" @click="goToReport">
-        <text class="btn-text">铲一铲</text>
+        <text class="btn-text">铲泡屎</text>
         <text class="btn-sub">发现便便 立即上报</text>
       </button>
     </view>
@@ -50,10 +50,10 @@ const fetchMarkers = async () => {
         id: item.id,
         latitude: parseFloat(item.latitude),
         longitude: parseFloat(item.longitude),
-        // title: item.status === '1' ? '已清理' : '待清理',
-        title: '一坨便便',
-        // iconPath: item.status === '1' ? '/static/tabbar/report_active.png' : '/static/tabbar/report.png',
-        iconPath: '/static/tabbar/report_active.png',
+        title: item.status === '1' ? '已清理' : '待清理',
+        // title: '一坨便便',
+        iconPath: item.status === '1' ? '/static/tabbar/report_active.png' : '/static/tabbar/report.png',
+        // iconPath: '/static/tabbar/report_active.png',
         width: 30,
         height: 30
       }))

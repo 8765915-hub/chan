@@ -1,5 +1,5 @@
 // api.js
-const baseURL = 'http://192.168.0.35:8080'
+const baseURL = 'https://chan.58w.fun/prod-api'
 
 export const request = (options) => {
   return new Promise((resolve, reject) => {

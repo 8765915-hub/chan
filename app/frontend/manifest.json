@@ -1,6 +1,6 @@
 {
-    "name" : "铲一铲",
-    "appid" : "__UNI__xxxxxxx",
+    "name" : "铲泡屎",
+    "appid" : "__UNI__980F2C1",
     "description" : "宠物粪便上报与积分系统",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -46,7 +46,8 @@
     "mp-weixin" : {
         "appid" : "wxddf493599e25cf44",
         "setting" : {
-            "urlCheck" : false
+            "urlCheck" : false,
+            "minified" : true
         },
         "usingComponents" : true,
         "requiredPrivateInfos" : [ "getLocation" ],
