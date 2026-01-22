@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.system;
 
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,8 +75,16 @@ public class BusReportController extends BaseController
     @Log(title = "上报记录", businessType = BusinessType.INSERT)
     @RateLimiter(key = "report", time = 10, count = 1, limitType = LimitType.IP)
     @PostMapping
-    public AjaxResult add(@RequestBody BusReport busReport)
+    public AjaxResult add(@RequestBody BusReport busReport, HttpServletRequest request)
     {
+        // 校验请求来源 Referer
+        String referer = request.getHeader("Referer");
+        // 如果是小程序或App环境，Referer可能为 "servicewechat.com" 或 自定义Scheme
+        // 如果是H5，Referer应为域名
+        if (referer == null || (!referer.contains("servicewechat.com") && !referer.contains("39.108.87.172") && !referer.contains("localhost"))) {
+             return error("非法请求来源");
+        }
+        
         busReport.setCreateBy(getUsername());
         return toAjax(busReportService.insertBusReport(busReport));
     }
