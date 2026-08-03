@@ -1,6 +1,12 @@
 {
 	"pages": [
 		{
+			"path": "pages/guide/guide",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "城市微光"

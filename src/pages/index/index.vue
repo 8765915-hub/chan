@@ -11,6 +11,20 @@
       @markertap="handleMarkerTap"
     ></map>
     
+    <!-- 定位失败提示条 - 显示在地图顶部，点击可重试定位 -->
+    <view class="location-fail-bar" v-if="locationFailed" @click="retryLocation">
+      <text class="fail-icon">⚠</text>
+      <text>定位失败，点击重试</text>
+    </view>
+    
+    <!-- 空状态卡片 - 加载完成且无打卡点时显示在地图中部，不遮挡底部按钮 -->
+    <view class="empty-card" v-if="loaded && markers.length === 0 && showEmptyCard">
+      <text class="empty-close" @click="closeEmptyCard">×</text>
+      <text class="empty-title">附近还没有打卡点</text>
+      <text class="empty-desc">成为第一个发现美好的人吧</text>
+      <button class="empty-btn" hover-class="btn-hover" @click="goToReport">成为第一个打卡的人</button>
+    </view>
+    
     <!-- 定位按钮 - 放在map外面避免遮挡popup -->
     <view class="reset-location" @click="resetLocation">
       <image class="icon" src="/static/images/dingwei.png"></image>
@@ -71,14 +85,26 @@ const locationStore = useLocationStore()
 // Markers data
 const markers = ref([])
 const currentMarker = ref(null)
+// 数据加载完成标志，控制空状态卡片的显示时机
+const loaded = ref(false)
+// 定位失败标志，控制定位失败提示条的显示
+const locationFailed = ref(false)
+// 空状态卡片是否可见（用户点击 × 关闭后本次不再显示）
+const showEmptyCard = ref(true)
 
 onMounted(async () => {
+  // 先尝试获取定位；定位失败不阻塞后续数据加载
   try {
     await locationStore.updateLocation()
-    fetchMarkers()
   } catch (e) {
     console.error('Location error:', e)
   }
+  // 根据定位 store 中的 error 字段判断是否定位失败
+  locationFailed.value = !!locationStore.error
+  // 加载打卡点数据
+  await fetchMarkers()
+  // 数据加载完成，开始渲染地图标记或空状态
+  loaded.value = true
 })
 
 const fetchMarkers = async () => {
@@ -197,6 +223,23 @@ const goToReport = () => {
   })
 }
 
+// 关闭空状态卡片（用户点击右上角 × 后本次不再显示）
+const closeEmptyCard = () => {
+  showEmptyCard.value = false
+}
+
+// 点击定位失败提示条：重试定位，成功后隐藏提示条并刷新地图数据
+const retryLocation = async () => {
+  try {
+    await locationStore.updateLocation()
+    // 定位成功后清除失败标志，并重新拉取打卡点数据
+    locationFailed.value = false
+    await fetchMarkers()
+  } catch (e) {
+    console.error('Retry location failed:', e)
+  }
+}
+
 const resetLocation = () => {
   const mapCtx = uni.createMapContext('map')
   mapCtx.moveToLocation()
@@ -235,6 +278,83 @@ onShareTimeline((res) => {
   flex: 1;
   width: 100%;
   position: relative;
+}
+
+// 定位失败提示条 - 位于地图顶部居中，z-index 低于定位按钮
+.location-fail-bar {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 10px 24px;
+  font-size: 14px;
+  color: #e74c3c;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 90;
+  white-space: nowrap;
+
+  .fail-icon {
+    margin-right: 6px;
+  }
+}
+
+// 空状态卡片 - 地图中部半透明浮层，不遮挡底部随手拍按钮与右侧定位按钮
+.empty-card {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 260px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  padding: 28px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  z-index: 80;
+
+  .empty-close {
+    position: absolute;
+    top: 6px;
+    right: 12px;
+    font-size: 24px;
+    color: #999;
+    line-height: 1;
+    padding: 0 4px;
+  }
+
+  .empty-title {
+    font-size: 17px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+  }
+
+  .empty-desc {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 20px;
+  }
+
+  .empty-btn {
+    height: 40px;
+    line-height: 40px;
+    padding: 0 30px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    font-size: 14px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+
+    &::after {
+      border: none;
+    }
+  }
 }
 
 .reset-location {

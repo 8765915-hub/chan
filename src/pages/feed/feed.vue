@@ -39,6 +39,10 @@
         <image src="/static/images/empty.png" mode="aspectFit" class="empty-img"></image>
         <text class="empty-text">暂无内容</text>
         <text class="empty-tip">成为第一个分享的人吧</text>
+        <!-- 行动引导按钮：跳转打卡页 -->
+        <view class="empty-btn" @click="goToReport">
+          <text class="empty-btn-text">我要打卡</text>
+        </view>
       </view>
 
       <!-- 列表 -->
@@ -214,6 +218,13 @@ const formatDate = (dateStr) => {
 const goToDetail = (item) => {
   uni.navigateTo({
     url: `/pages/feed/detail?id=${item._id || item.id}`
+  })
+}
+
+// 空状态行动引导：跳转到打卡页
+const goToReport = () => {
+  uni.navigateTo({
+    url: '/pages/report/report'
   })
 }
 
@@ -395,6 +406,25 @@ page {
   .empty-tip {
     font-size: 13px;
     color: #999;
+    margin-bottom: 24px;
+  }
+  
+  // 行动引导按钮：紫色渐变圆角样式
+  .empty-btn {
+    padding: 11px 48px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
+    
+    &:active {
+      opacity: 0.85;
+    }
+    
+    .empty-btn-text {
+      font-size: 15px;
+      color: #fff;
+      font-weight: 500;
+    }
   }
 }
 

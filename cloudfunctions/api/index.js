@@ -8,6 +8,11 @@ cloud.init({
 const db = cloud.database()
 const _ = db.command
 
+// 订阅消息模板 ID（审核结果通知）
+// 申请地址：微信公众平台 -> 功能 -> 订阅消息
+// 留空则跳过推送，不影响审核流程
+const SUBSCRIBE_TEMPLATE_ID = 'QJiFxbJ7bE7rlhERmDOm7hahgyY4h6E4rQ7Q8aJrKmE'
+
 exports.main = async (event, context) => {
   const { url, method, data, token } = event
   const wxContext = cloud.getWXContext()
@@ -81,6 +86,11 @@ exports.main = async (event, context) => {
   // 11. 兑换商品
   if (url === '/shop/redeem') {
       return handleRedeemProduct(data, OPENID)
+  }
+
+  // 12. 导入官方示例内容（仅管理员）
+  if (url === '/seed/content') {
+    return handleSeedContent(data, OPENID)
   }
 
   return {
@@ -553,7 +563,22 @@ async function handleAuditReport(data, openid) {
   try {
     const reportRes = await db.collection('reports').doc(id).get()
     const report = reportRes.data
-    
+    const targetOpenid = report.openid
+
+    // 首次打卡奖励计算：
+    // 查询该用户是否已有其他审核通过的记录（排除当前记录），若没有则视为首次通过，额外奖励 5 分
+    let bonus = 0
+    if (status === '1') {
+      const approvedCount = await db.collection('reports').where({
+        openid: targetOpenid,
+        status: '1',
+        _id: _.neq(id)
+      }).count()
+      if (approvedCount.total === 0) {
+        bonus = 5 // 首次打卡奖励积分
+      }
+    }
+
     // 更新状态
     await db.collection('reports').doc(id).update({
       data: {
@@ -561,21 +586,42 @@ async function handleAuditReport(data, openid) {
         remark: remark || '',
         auditTime: new Date(),
         auditor: openid,
-        awardedPoints: status === '1' ? points : 0 // 记录获得的积分
+        awardedPoints: status === '1' ? points + bonus : 0, // 记录获得的积分（含首次奖励 bonus）
+        bonus: bonus // 首次打卡奖励积分（非首次为 0）
       }
     })
-    
-    // 如果审核通过，给用户加分
+
+    // 如果审核通过，给用户加分（含首次打卡奖励 bonus）
     if (status === '1' && points > 0) {
-      const targetOpenid = report.openid
       // 原子操作自增
       await db.collection('users').where({ openid: targetOpenid }).update({
         data: {
-          points: _.inc(points)
+          points: _.inc(points + bonus)
         }
       })
     }
-    
+
+    // 审核结果订阅消息推送（仅配置了模板 ID 时执行）
+    // 注意：字段名（thing1/phrase2/time3/thing4）为示例，若与用户的订阅消息模板不匹配，请自行按模板字段调整
+    if (SUBSCRIBE_TEMPLATE_ID) {
+      try {
+        await cloud.openapi.subscribeMessage.send({
+          touser: report.openid,
+          templateId: SUBSCRIBE_TEMPLATE_ID,
+          page: 'pages/index/index',
+          data: {
+            thing23: { value: (report.description || '文明打卡').slice(0, 20) },
+            phrase5: { value: status === '1' ? '审核通过' : '已驳回' },
+            date7: { value: new Date().toLocaleDateString() },
+            thing11: { value: (remark || '暂无备注').slice(0, 20) }
+          }
+        })
+      } catch (e) {
+        // 推送失败不影响审核流程，仅记录日志
+        console.warn('订阅消息推送失败:', e)
+      }
+    }
+
     return { code: 200, msg: '审核完成' }
   } catch (e) {
     console.error(e)
@@ -626,6 +672,80 @@ async function handleAdminListReport(data, openid) {
   return {
     code: 200,
     rows: rows
+  }
+}
+
+// 导入官方示例内容（仅管理员）
+// 用于首次部署后快速填充首页/地图的示例数据，带 seedKey 去重，可重复调用
+async function handleSeedContent(data, openid) {
+  // 1. 管理员权限校验：非管理员禁止导入
+  const isAdmin = await checkAdmin(openid)
+  if (!isAdmin) {
+    return { code: 403, msg: '无权操作' }
+  }
+
+  try {
+    // 2. 去重校验：若已导入过官方示例内容，直接返回，避免重复插入
+    const seedCount = await db.collection('reports').where({ seedKey: 'official_seed_v1' }).count()
+    if (seedCount.total > 0) {
+      return { code: 200, msg: '示例内容已导入，无需重复导入' }
+    }
+
+    // 3. 官方示例内容列表（坐标参考广州市）
+    const seedList = [
+      {
+        type: 'beauty',
+        description: '清晨的珠江边，城市在晨光中苏醒，随手记录这份美好',
+        latitude: 23.116,
+        longitude: 113.322,
+        address: '广州市海珠区珠江边',
+        media: [{ type: 'image', url: '/static/images/icon.png' }],
+        images: '/static/images/icon.png',
+        status: '1',
+        seedKey: 'official_seed_v1',
+        createTime: new Date(),
+        likes: 0,
+        awardedPoints: 0
+      },
+      {
+        type: 'behavior',
+        description: '志愿者在社区门口引导行人文明过马路，为他们的坚守点赞',
+        latitude: 23.129,
+        longitude: 113.264,
+        address: '广州市越秀区中山路',
+        media: [{ type: 'image', url: '/static/images/icon.png' }],
+        images: '/static/images/icon.png',
+        status: '1',
+        seedKey: 'official_seed_v1',
+        createTime: new Date(),
+        likes: 0,
+        awardedPoints: 0
+      },
+      {
+        type: 'public',
+        description: '周末公益市集，旧物置换传递环保理念，一起来参与吧',
+        latitude: 23.137,
+        longitude: 113.318,
+        address: '广州市天河区体育中心',
+        media: [{ type: 'image', url: '/static/images/icon.png' }],
+        images: '/static/images/icon.png',
+        status: '1',
+        seedKey: 'official_seed_v1',
+        createTime: new Date(),
+        likes: 0,
+        awardedPoints: 0
+      }
+    ]
+
+    // 4. 逐条插入官方示例内容
+    for (const item of seedList) {
+      await db.collection('reports').add({ data: item })
+    }
+
+    return { code: 200, msg: '示例内容导入成功' }
+  } catch (e) {
+    console.error('Seed content failed:', e)
+    return { code: 500, msg: '导入失败: ' + e.message }
   }
 }
 

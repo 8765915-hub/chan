@@ -1,5 +1,9 @@
 <template>
   <view class="container">
+    <!-- 导入示例内容栏（管理员专用） -->
+    <view class="import-bar">
+      <button size="mini" type="primary" class="import-btn" @click="importSeed">导入示例内容</button>
+    </view>
     <view class="list" v-if="list.length > 0">
       <view class="item" v-for="(item, index) in list" :key="index">
         <view class="header-row">
@@ -87,6 +91,31 @@ const getList = async () => {
   } catch (e) {
     console.error(e)
     uni.showToast({ title: '获取列表失败', icon: 'none' })
+  } finally {
+    uni.hideLoading()
+  }
+}
+
+/**
+ * 导入示例内容
+ * 调用后端 /seed/content 接口导入示例数据，成功后刷新列表
+ */
+const importSeed = async () => {
+  try {
+    uni.showLoading({ title: '导入中' })
+    const res = await request({
+      url: '/seed/content',
+      method: 'POST'
+    })
+    if (res.code === 200) {
+      uni.showToast({ title: res.msg || '导入成功' })
+      getList() // 刷新列表
+    } else {
+      uni.showToast({ title: res.msg || '导入失败', icon: 'none' })
+    }
+  } catch (e) {
+    console.error(e)
+    uni.showToast({ title: '导入失败', icon: 'none' })
   } finally {
     uni.hideLoading()
   }
@@ -246,6 +275,16 @@ onShow(() => {
   min-height: 100vh;
   background-color: #f5f5f5;
   padding: 10px;
+}
+
+.import-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+
+  .import-btn {
+    margin: 0;
+  }
 }
 
 .item {

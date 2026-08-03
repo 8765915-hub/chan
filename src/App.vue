@@ -17,6 +17,16 @@ export default {
       })
     }
     
+    // 首次启动引导：未看过引导页则跳转到引导页（用 try/catch 包裹避免异常影响启动）
+    try {
+      const guideSeen = uni.getStorageSync('guide_seen')
+      if (!guideSeen) {
+        uni.redirectTo({ url: '/pages/guide/guide' })
+      }
+    } catch (e) {
+      console.error('引导页判断失败:', e)
+    }
+    
     const userStore = useUserStore()
     userStore.init()
   },

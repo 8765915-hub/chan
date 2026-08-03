@@ -105,10 +105,17 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { onLoad, onHide } from '@dcloudio/uni-app'
 import { useLocationStore } from '@/store/modules/location'
 import { useUserStore } from '@/store/modules/user'
 import { addReport } from '@/api/report'
 import { uploadFile } from '@/utils/request'
+import { SUBSCRIBE_TEMPLATE_ID } from '@/config'
+
+// 草稿本地存储 key
+const DRAFT_KEY = 'report_draft'
+// 各打卡类型对应的积分奖励
+const REPORT_POINTS = { beauty: 10, behavior: 15, public: 20 }
 
 const locationStore = useLocationStore()
 const userStore = useUserStore()
@@ -127,6 +134,69 @@ const reportTypes = [
 onMounted(() => {
   locationStore.updateLocation()
 })
+
+// 进入页面时读取草稿并回填表单
+onLoad(() => {
+  restoreDraft()
+})
+
+// 页面隐藏时保存当前表单为草稿（内存状态保留，草稿作为兜底）
+onHide(() => {
+  saveDraft()
+})
+
+// 保存草稿：将当前表单内容写入本地存储
+const saveDraft = () => {
+  uni.setStorageSync(DRAFT_KEY, {
+    reportType: reportType.value,
+    description: description.value,
+    location: {
+      address: locationStore.address,
+      latitude: locationStore.latitude,
+      longitude: locationStore.longitude
+    },
+    media: mediaList.value
+  })
+}
+
+// 恢复草稿：读取本地存储并回填，逐张校验媒体临时路径是否仍有效
+const restoreDraft = async () => {
+  const draft = uni.getStorageSync(DRAFT_KEY)
+  if (!draft) return
+
+  // 回填打卡类型与描述
+  if (draft.reportType) reportType.value = draft.reportType
+  if (draft.description) description.value = draft.description
+
+  // 回填位置信息
+  if (draft.location && draft.location.address) {
+    locationStore.setAddress(draft.location.address)
+    locationStore.setLatitude(draft.location.latitude)
+    locationStore.setLongitude(draft.location.longitude)
+  }
+
+  // 回填媒体列表：逐张校验临时路径是否仍有效，失效的过滤掉
+  if (draft.media && draft.media.length) {
+    const validMedia = []
+    for (const item of draft.media) {
+      try {
+        // 通过 getFileInfo 校验临时文件是否仍然存在
+        await new Promise((resolve, reject) => {
+          uni.getFileSystemManager().getFileInfo({ filePath: item.path, success: resolve, fail: reject })
+        })
+        validMedia.push(item)
+      } catch (e) {
+        console.error('草稿媒体文件已失效', item.path, e)
+      }
+    }
+    if (validMedia.length) {
+      mediaList.value = validMedia
+    } else {
+      // 原草稿有媒体但全部失效，提示用户重新选择
+      uni.showToast({ title: '部分媒体已失效，请重新选择', icon: 'none' })
+    }
+  }
+}
 
 const chooseLocation = () => {
   uni.chooseLocation({
@@ -178,8 +248,9 @@ const previewMedia = (index) => {
 
 const submitReport = async () => {
   if (!userStore.isLoggedIn) {
-    uni.showToast({ title: '请先登录', icon: 'none' })
-    setTimeout(() => uni.switchTab({ url: '/pages/user/user' }), 1500)
+    // 未登录：先保存草稿，再跳转登录页，登录后返回即可继续打卡
+    saveDraft()
+    uni.navigateTo({ url: '/pages/login/login?from=report' })
     return
   }
   
@@ -264,11 +335,38 @@ const submitReport = async () => {
 
     const res = await addReport(reportData)
     if (res.code === 200) {
+      // 记录打卡次数（保留原有逻辑），并判断是否为首次打卡
+      const isFirst = userStore.reportCount === 0
       userStore.incrementReportCount()
-      uni.showToast({ title: '打卡成功，等待审核', icon: 'success' })
+      // 计算本次预计获得的积分
+      const points = REPORT_POINTS[reportType.value] || 10
+
+      // 订阅消息授权（一次性订阅）：模板 ID 非空时请求，try/catch 包裹，不阻塞主流程
+      if (SUBSCRIBE_TEMPLATE_ID) {
+        try {
+          wx.requestSubscribeMessage({
+            tmplIds: [SUBSCRIBE_TEMPLATE_ID],
+            complete: () => {}
+          })
+        } catch (e) {
+          console.error('订阅消息请求失败', e)
+        }
+      }
+
+      // 提交成功即时反馈：弹窗告知积分，确认后清除草稿并返回上一页
+      uni.showModal({
+        title: '打卡成功',
+        content: `审核通过后将获得 ${points} 积分${isFirst ? '，首次通过额外奖励 +5 分' : ''}。内容需审核通过后展示。`,
+        showCancel: false,
+        confirmText: '知道了',
+        success: () => {
+          uni.removeStorageSync(DRAFT_KEY)
+          uni.navigateBack()
+        }
+      })
+      // 保留原有清空表单逻辑（以不报错为准）
       mediaList.value = []
       description.value = ''
-      setTimeout(() => uni.navigateBack(), 1500)
     } else {
       uni.showToast({ title: res.msg || '打卡失败', icon: 'none' })
     }

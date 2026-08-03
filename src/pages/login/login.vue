@@ -14,9 +14,18 @@
 
 <script setup>
 import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
 import { useUserStore } from '@/store/modules/user'
 
 const userStore = useUserStore()
+
+// 记录来源页面：from=report 表示从打卡页跳转而来，登录成功后需立即返回
+let fromPage = ''
+
+// 页面加载时读取路由参数
+onLoad((options) => {
+  fromPage = options.from || ''
+})
 
 const doWechatLogin = async () => {
   try {
@@ -24,9 +33,15 @@ const doWechatLogin = async () => {
     await userStore.login()
     uni.hideLoading()
     uni.showToast({ title: '登录成功' })
-    setTimeout(() => {
+    if (fromPage === 'report') {
+      // 从打卡页跳转而来：立即返回，不延时，方便用户继续打卡
       uni.navigateBack()
-    }, 1500)
+    } else {
+      // 其他入口：展示登录成功提示后再返回
+      setTimeout(() => {
+        uni.navigateBack()
+      }, 1500)
+    }
   } catch (e) {
     uni.hideLoading()
     console.error(e)
