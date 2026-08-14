@@ -11,24 +11,24 @@
       <view class="tab-bar">
         <view 
           class="tab-item" 
-          :class="{ active: currentTab === 'week' }" 
-          @click="changeTab('week')"
+          :class="{ active: currentTab === 'stamps' }" 
+          @click="changeTab('stamps')"
         >
-          <text class="tab-name">周榜</text>
+          <text class="tab-name">集章榜</text>
         </view>
         <view 
           class="tab-item" 
-          :class="{ active: currentTab === 'month' }" 
-          @click="changeTab('month')"
+          :class="{ active: currentTab === 'week' }" 
+          @click="changeTab('week')"
         >
-          <text class="tab-name">月榜</text>
+          <text class="tab-name">周积分</text>
         </view>
         <view 
           class="tab-item" 
           :class="{ active: currentTab === 'total' }" 
           @click="changeTab('total')"
         >
-          <text class="tab-name">总榜</text>
+          <text class="tab-name">总积分</text>
         </view>
         <!-- 滑块 -->
         <view class="tab-slider" :style="{ left: sliderLeft }"></view>
@@ -49,7 +49,7 @@
             <view class="rank-badge silver">2</view>
           </view>
           <text class="name">{{ rankList[1]?.name || '虚位以待' }}</text>
-          <text class="score">{{ rankList[1] ? rankList[1].score + ' 分' : '--' }}</text>
+          <text class="score">{{ rankList[1] ? rankList[1].score + scoreUnit : '--' }}</text>
         </view>
 
         <!-- 第一名 -->
@@ -65,7 +65,7 @@
             <view class="rank-badge gold">1</view>
           </view>
           <text class="name">{{ rankList[0]?.name || '虚位以待' }}</text>
-          <text class="score">{{ rankList[0] ? rankList[0].score + ' 分' : '--' }}</text>
+          <text class="score">{{ rankList[0] ? rankList[0].score + scoreUnit : '--' }}</text>
         </view>
 
         <!-- 第三名 -->
@@ -79,7 +79,7 @@
             <view class="rank-badge bronze">3</view>
           </view>
           <text class="name">{{ rankList[2]?.name || '虚位以待' }}</text>
-          <text class="score">{{ rankList[2] ? rankList[2].score + ' 分' : '--' }}</text>
+          <text class="score">{{ rankList[2] ? rankList[2].score + scoreUnit : '--' }}</text>
         </view>
       </view>
     </view>
@@ -119,7 +119,7 @@
               <image :src="item.avatar" class="avatar" mode="aspectFill"></image>
               <text class="name">{{ item.name }}</text>
             </view>
-            <text class="score">{{ item.score }}</text>
+            <text class="score">{{ item.score }}{{ scoreUnit }}</text>
           </view>
           <!-- 底部占位 -->
           <view class="list-bottom"></view>
@@ -139,22 +139,27 @@ import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { getRankList } from '../../api/rank'
 
-const currentTab = ref('week')
+const currentTab = ref('stamps')
 const rankList = ref([])
 const loading = ref(false)
 const scrollHeight = ref(200)
 
 // 滑块位置
 const sliderLeft = computed(() => {
-  const positions = { week: '16.66%', month: '50%', total: '83.33%' }
+  const positions = { stamps: '16.66%', week: '50%', total: '83.33%' }
   return positions[currentTab.value]
 })
 
-// 获取积分标签文字
+// 分数单位：集章榜用"枚"，积分榜用"分"
+const scoreUnit = computed(() => {
+  return currentTab.value === 'stamps' ? ' 枚' : ' 分'
+})
+
+// 获取榜单标签文字
 const getScoreLabel = () => {
   const labels = {
+    stamps: '本周集章',
     week: '本周积分',
-    month: '本月积分',
     total: '总积分'
   }
   return labels[currentTab.value] || '积分'
@@ -163,11 +168,13 @@ const getScoreLabel = () => {
 const loadRankList = async () => {
   loading.value = true
   try {
-    const res = await getRankList(currentTab.value)
+    // 集章榜走 stamps-week 接口
+    const type = currentTab.value === 'stamps' ? 'stamps-week' : currentTab.value
+    const res = await getRankList(type)
     if (res.code === 200) {
       rankList.value = res.rows.map(item => ({
         name: item.nickName || '未命名',
-        score: item.points || 0,
+        score: item.stamps !== undefined ? item.stamps : (item.points || 0),
         avatar: item.avatarUrl || '/static/images/icon.png'
       }))
     }

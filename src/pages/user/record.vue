@@ -11,10 +11,10 @@
           <text class="currency">💎</text>
           <text class="number">{{ formatPoints(userStore.points) }}</text>
         </view>
-        <view class="points-desc">积分可用于兑换勋章</view>
+        <view class="points-desc">打卡集章即可获得积分</view>
       </view>
       <view class="shop-btn" @click="goToShop">
-        <text>去兑换</text>
+        <text>我的印章</text>
         <text class="arrow">›</text>
       </view>
     </view>
@@ -58,7 +58,7 @@
         >
           <view class="item-left">
             <view class="type-tag" :class="item.type">
-              {{ getTypeLabel(item.type) }}
+              {{ getTypeLabel(item.type, item) }}
             </view>
             <view class="item-time">{{ formatDate(item.createTime) }}</view>
           </view>
@@ -72,9 +72,9 @@
       <view class="empty-box" v-else>
         <image src="/static/images/empty.png" mode="aspectFit" class="empty-img"></image>
         <text class="empty-text">还没有积分记录</text>
-        <text class="empty-tip">上传城市美景或文明行为即可获得积分</text>
+        <text class="empty-tip">到打卡点实地、回忆或云打卡即可获得积分</text>
         <view class="action-btn" @click="goToReport">
-          <text>立即上传</text>
+          <text>立即打卡</text>
         </view>
       </view>
     </view>
@@ -165,14 +165,16 @@ const goToShop = () => {
 }
 
 const goToReport = () => {
-  uni.switchTab({ url: '/pages/report/report' })
+  uni.navigateTo({ url: '/pages/report/report' })
 }
 
-const getTypeLabel = (type) => {
+const getTypeLabel = (type, item) => {
+  if (item && item.spotName) return item.spotName
   const map = {
     'beauty': '城市美景',
     'behavior': '文明行为',
-    'public': '公益行动'
+    'public': '公益行动',
+    'spot': '打卡集章'
   }
   return map[type] || '其他'
 }
@@ -181,7 +183,8 @@ const getTypePoints = (type) => {
   const map = {
     'beauty': 10,
     'behavior': 15,
-    'public': 20
+    'public': 20,
+    'spot': 20
   }
   return map[type] || 10
 }

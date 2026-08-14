@@ -35,7 +35,7 @@
           </view>
           <view class="row-4">
             <text class="remark" v-if="item.remark && item.status == '2'">驳回原因: {{ item.remark }}</text>
-            <view class="actions" v-if="item.status === '0'">
+            <view class="actions">
               <button size="mini" type="warn" class="btn-delete" @click.stop="handleDelete(item)">删除</button>
             </view>
           </view>
@@ -142,7 +142,10 @@ const showDetail = (item) => {
 const handleDelete = (item) => {
   uni.showModal({
     title: '删除确认',
-    content: '确定要删除这条待审核记录吗？',
+    content: item.status === '1'
+      ? '确定要删除这条已通过的打卡吗？删除后会同步扣回获得的积分和印章，且不可恢复。'
+      : '确定要删除这条记录吗？删除后不可恢复。',
+    confirmColor: '#e64340',
     success: async (res) => {
       if (res.confirm) {
         try {
@@ -157,6 +160,7 @@ const handleDelete = (item) => {
           
           if (delRes.code === 200) {
             userStore.decrementReportCount() // Update local store
+            userStore.getUserInfo() // 刷新积分/印章（已通过记录删除会回滚）
             uni.showToast({ title: '删除成功' })
             getHistoryList() // 刷新列表
           } else {
@@ -276,7 +280,6 @@ onShow(() => {
         }
         
         .actions {
-            width: 100%;
             display: flex;
             justify-content: flex-end;
             

@@ -1,7 +1,7 @@
 {
-    "name" : "城市微光",
+    "name" : "城市印章",
     "appid" : "__UNI__980F2C1",
-    "description" : "市民随手拍文明行为、城市美景，完成公益任务，赚积分领荣誉，城市文明共建平台",
+    "description" : "打卡城市地标与景区，拍照集章，点亮专属足迹地图",
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,

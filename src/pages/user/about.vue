@@ -2,7 +2,7 @@
   <view class="container">
     <view class="logo-container">
       <image src="/static/logo.png" class="logo"></image>
-      <view class="app-name">城市微光</view>
+      <view class="app-name">城市印章</view>
       <view class="version">Version {{version || '1.0.0'}}</view>
     </view>
     
@@ -10,7 +10,7 @@
       <view class="section">
         <view class="title">项目介绍</view>
         <view class="text">
-          “城市微光”是一个城市文明共建平台，鼓励市民随手拍下城市美景、文明瞬间与公益行动。用微小的力量汇聚成城市文明的璀璨星河。每一次打卡都是对家园的热爱，每一份分享都能点亮城市的文明之光。
+          “城市印章”是一款城市地标与景区集章打卡小程序。走到全国地标、景区与特色街区的打卡点，拍照打卡即可点亮专属印章，集齐系列印章解锁隐藏徽章，生成足迹地图与打卡海报分享给好友。
         </view>
       </view>
       
@@ -28,7 +28,7 @@
     </view>
     
     <view class="footer">
-      <text>Copyright © 2026 城市微光 All Rights Reserved</text>
+      <text>Copyright © 2026 城市印章 All Rights Reserved</text>
       <text>idea团队: web前端学习营地</text>
     </view>
   </view>

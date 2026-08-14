@@ -1,242 +1,247 @@
 <template>
   <view class="container">
-    <!-- 积分头部 -->
+    <!-- 印章统计头部 -->
     <view class="header">
-      <view class="points-card">
-        <view class="points-bg">
+      <view class="stamp-card">
+        <view class="stamp-bg">
           <view class="circle circle-1"></view>
           <view class="circle circle-2"></view>
         </view>
-        <view class="points-content">
-          <view class="points-icon">
-            <text class="icon">💎</text>
+        <view class="stamp-content">
+          <view class="stamp-icon">
+            <text class="icon">🕹️</text>
           </view>
-          <view class="points-info">
-            <text class="label">我的积分</text>
-            <text class="num">{{ formatPoints((userStore.userInfo && userStore.userInfo.points) || 0) }}</text>
+          <view class="stamp-info">
+            <text class="label">已收集印章</text>
+            <view class="num-row">
+              <text class="num">{{ album.totalCollected }}</text>
+              <text class="total">/ {{ album.totalSpots || 186 }}</text>
+            </view>
+          </view>
+        </view>
+        <view class="progress-bar">
+          <view class="progress-inner" :style="{ width: progressPercent + '%' }"></view>
+        </view>
+        <view class="progress-text">集齐一个省的全部印章，即可解锁该省系列徽章</view>
+      </view>
+    </view>
+
+    <!-- 系列进度 -->
+    <view class="section">
+      <view class="section-header">
+        <view class="section-title">
+          <text class="title-icon">🗂️</text>
+          <text class="title-text">系列进度</text>
+        </view>
+        <text class="section-desc">{{ completedCount }} 个系列已完成</text>
+      </view>
+
+      <view class="series-list">
+        <view
+          class="series-item"
+          v-for="group in seriesGroups"
+          :key="group.province"
+          @click="toggleExpand(group.province)"
+        >
+          <view class="series-head">
+            <view class="series-info">
+              <text class="series-name">{{ group.series }}</text>
+              <text class="series-province">{{ group.province }} · {{ group.collected }}/{{ group.total }} 枚</text>
+            </view>
+            <view class="series-right">
+              <view class="series-bar">
+                <view class="series-bar-inner" :style="{ width: (group.total ? group.collected / group.total * 100 : 0) + '%' }"></view>
+              </view>
+              <text class="series-done" v-if="group.done">✓ 完成</text>
+              <text class="series-arrow" :class="{ open: expanded === group.province }">›</text>
+            </view>
+          </view>
+
+          <!-- 展开的省印章 -->
+          <view class="series-detail" v-if="expanded === group.province">
+            <view
+              class="stamp-cell"
+              v-for="s in group.spots"
+              :key="s.code"
+              :class="{ done: s.checkedIn }"
+            >
+              <view class="stamp-seal">
+                <text class="seal-emoji">{{ getCategoryEmoji(s.category) }}</text>
+                <text class="seal-check" v-if="s.checkedIn">✓</text>
+              </view>
+              <text class="stamp-name">{{ s.name }}</text>
+            </view>
           </view>
         </view>
       </view>
     </view>
-    
-    <!-- 勋章兑换区 -->
-    <view class="section">
+
+    <!-- 已收集印章时间线 -->
+    <view class="section" v-if="album.stamps && album.stamps.length > 0">
       <view class="section-header">
         <view class="section-title">
-          <text class="title-icon">🏆</text>
-          <text class="title-text">勋章兑换</text>
+          <text class="title-icon">📸</text>
+          <text class="title-text">最近收集</text>
         </view>
-        <text class="section-desc">兑换勋章，展示个性</text>
       </view>
-      
-      <view class="product-grid">
-        <view 
-          class="product-card" 
-          v-for="(item, index) in productList" 
-          :key="index"
-          :class="{ owned: isOwned(item.id), disabled: !canRedeem(item) }"
-        >
-          <!-- 已拥有角标 -->
-          <view class="owned-badge" v-if="isOwned(item.id)">
-            <text class="owned-text">已拥有</text>
+      <view class="stamp-timeline">
+        <view class="timeline-item" v-for="(item, index) in album.stamps.slice(0, 8)" :key="index">
+          <view class="timeline-seal">
+            <text class="seal-emoji">{{ getModeEmoji(item.mode) }}</text>
           </view>
-          
-          <!-- 勋章图标 -->
-          <view class="badge-box">
-            <image 
-              :src="item.image || '/static/badges/' + item.id + '.png'" 
-              class="badge-img"
-              mode="aspectFit"
-            ></image>
-            <view class="shine"></view>
-          </view>
-          
-          <!-- 勋章信息 -->
-          <view class="product-info">
-            <text class="name">{{ item.name }}</text>
-            <text class="desc">{{ item.description }}</text>
-          </view>
-          
-          <!-- 价格和按钮 -->
-          <view class="product-footer">
-            <view class="price-box">
-              <text class="price-icon">💎</text>
-              <text class="price-num">{{ item.price }}</text>
-            </view>
-            <button 
-              class="redeem-btn"
-              :class="{ 
-                'btn-owned': isOwned(item.id), 
-                'btn-can': canRedeem(item),
-                'btn-cant': !canRedeem(item) && !isOwned(item.id)
-              }"
-              :disabled="isOwned(item.id) || !canRedeem(item)"
-              @click="handleRedeem(item)"
-            >
-              {{ getBtnText(item) }}
-            </button>
+          <view class="timeline-info">
+            <text class="timeline-name">{{ item.spotName }}</text>
+            <text class="timeline-time">{{ getModeLabel(item.mode) }} · {{ formatDate(item.createTime) }}</text>
           </view>
         </view>
       </view>
-      
-      <!-- 空状态 -->
-      <view class="empty-state" v-if="productList.length === 0">
-        <text class="empty-icon">📦</text>
-        <text class="empty-text">暂无商品</text>
-      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" v-if="album.totalCollected === 0">
+      <text class="empty-icon">🕹️</text>
+      <text class="empty-text">还没有收集印章</text>
+      <text class="empty-tip">去地图找找打卡点，点亮第一枚印章吧</text>
+      <button class="empty-btn" @click="goReport">去打卡集章</button>
     </view>
   </view>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/store/modules/user'
-import { request } from '@/utils/request'
+import { getMyStamps, listSpots } from '@/api/spot'
+import { getSeriesName, getModeLabel } from '@/utils/series'
 
 const userStore = useUserStore()
-const productList = ref([])
+const album = ref({ stamps: [], provinces: [], totalCollected: 0, totalSpots: 0 })
+const allSpots = ref([])
+const expanded = ref('')
 
-// 格式化积分，超过10000显示为1w+
-const formatPoints = (points) => {
-  if (points >= 10000) {
-    return (points / 10000).toFixed(1) + 'w'
-  }
-  return points
-}
-
-// 获取渐变色
-const getGradient = (color) => {
-  if (!color) return 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-  return `linear-gradient(135deg, ${color} 0%, ${color}dd 100%)`
-}
-
-// 判断是否可兑换
-const canRedeem = (item) => {
-  if (!userStore.isLoggedIn) return false
-  const points = (userStore.userInfo && userStore.userInfo.points) || 0
-  return points >= item.price
-}
-
-// 获取按钮文字
-const getBtnText = (item) => {
-  if (isOwned(item.id)) return '已拥有'
-  if (!userStore.isLoggedIn) return '去登录'
-  const points = (userStore.userInfo && userStore.userInfo.points) || 0
-  if (points < item.price) return '积分不足'
-  return '立即兑换'
-}
-
-const getProductList = async () => {
-  try {
-    const res = await request({
-      url: '/shop/list',
-      method: 'GET'
+const seriesGroups = computed(() => {
+  const groups = []
+  const byProvince = {}
+  allSpots.value.forEach(s => {
+    if (!byProvince[s.province]) byProvince[s.province] = []
+    byProvince[s.province].push(s)
+  })
+  Object.keys(byProvince).sort().forEach(province => {
+    const spots = byProvince[province]
+    const collected = spots.filter(s => s.checkedIn).length
+    groups.push({
+      province,
+      series: getSeriesName(province),
+      total: spots.length,
+      collected,
+      done: collected === spots.length && spots.length > 0,
+      spots
     })
+  })
+  return groups
+})
+
+const progressPercent = computed(() => {
+  if (!album.value.totalSpots) return 0
+  return Math.round(album.value.totalCollected / album.value.totalSpots * 100)
+})
+
+const completedCount = computed(() => {
+  return seriesGroups.value.filter(g => g.done).length
+})
+
+onShow(async () => {
+  if (userStore.isLoggedIn) userStore.getUserInfo()
+  await Promise.all([loadAlbum(), loadSpots()])
+})
+
+const loadAlbum = async () => {
+  try {
+    const res = await getMyStamps()
     if (res.code === 200) {
-      productList.value = res.rows
+      album.value = res.data
     }
   } catch (e) {
-    console.error(e)
+    console.error('Load album failed:', e)
   }
 }
 
-const isOwned = (productId) => {
-  const badges = (userStore.userInfo && userStore.userInfo.badges) || []
-  return badges.includes(productId)
-}
-
-const handleRedeem = (item) => {
-  if (!userStore.isLoggedIn) {
-    uni.navigateTo({ url: '/pages/login/login' })
-    return
-  }
-  
-  if (isOwned(item.id)) return
-  
-  const points = (userStore.userInfo && userStore.userInfo.points) || 0
-  if (points < item.price) {
-    uni.showToast({ title: '积分不足', icon: 'none' })
-    return
-  }
-  
-  uni.showModal({
-    title: '兑换确认',
-    content: `确定消耗 ${item.price} 积分兑换「${item.name}」吗？`,
-    confirmColor: '#ff6b6b',
-    success: async (res) => {
-      if (res.confirm) {
-        uni.showLoading({ title: '兑换中...' })
-        try {
-          const redeemRes = await request({
-            url: '/shop/redeem',
-            method: 'POST',
-            data: { productId: item.id }
-          })
-          
-          if (redeemRes.code === 200) {
-            uni.showToast({ title: '兑换成功', icon: 'success' })
-            userStore.getUserInfo()
-          } else {
-            uni.showToast({ title: redeemRes.msg || '兑换失败', icon: 'none' })
-          }
-        } catch (e) {
-          uni.showToast({ title: '兑换异常', icon: 'none' })
-        } finally {
-          uni.hideLoading()
-        }
-      }
+const loadSpots = async () => {
+  try {
+    const res = await listSpots({ limit: 500 })
+    if (res.code === 200) {
+      allSpots.value = res.rows || []
     }
-  })
+  } catch (e) {
+    console.error('Load spots failed:', e)
+  }
 }
 
-onShow(() => {
-  getProductList()
-  if (userStore.isLoggedIn) {
-    userStore.getUserInfo()
-  }
-})
+const toggleExpand = (province) => {
+  expanded.value = expanded.value === province ? '' : province
+}
+
+const getCategoryEmoji = (category) => {
+  const map = { '自然': '🏔️', '人文': '🏯', '街区': '🏮', '地标': '🗼' }
+  return map[category] || '📍'
+}
+
+const getModeEmoji = (mode) => {
+  const map = { onSite: '📍', memory: '📷', cloud: '☁️' }
+  return map[mode] || '🕹️'
+}
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  const pad = n => (n < 10 ? '0' + n : n)
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
+const goReport = () => {
+  uni.switchTab({ url: '/pages/index/index' })
+}
 </script>
 
 <style lang="scss">
 .container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #fff5f5 0%, #f8f8f8 30%, #f8f8f8 100%);
+  background: linear-gradient(180deg, #f3efff 0%, #f8f8f8 30%, #f8f8f8 100%);
   padding-bottom: 30px;
 }
 
-// 积分头部
+// 印章统计头部
 .header {
   padding: 20px;
-  
-  .points-card {
+
+  .stamp-card {
     position: relative;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 50%, #ffa5a5 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 20px;
     padding: 25px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
-    
-    .points-bg {
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.35);
+
+    .stamp-bg {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
       overflow: hidden;
-      
+
       .circle {
         position: absolute;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.1);
-        
+
         &.circle-1 {
           width: 150px;
           height: 150px;
           top: -50px;
           right: -30px;
         }
-        
+
         &.circle-2 {
           width: 80px;
           height: 80px;
@@ -245,14 +250,15 @@ onShow(() => {
         }
       }
     }
-    
-    .points-content {
+
+    .stamp-content {
       position: relative;
       display: flex;
       align-items: center;
       z-index: 1;
-      
-      .points-icon {
+      margin-bottom: 16px;
+
+      .stamp-icon {
         width: 60px;
         height: 60px;
         background: rgba(255, 255, 255, 0.25);
@@ -261,28 +267,62 @@ onShow(() => {
         align-items: center;
         justify-content: center;
         margin-right: 15px;
-        backdrop-filter: blur(10px);
-        
+
         .icon {
-          font-size: 32px;
+          font-size: 30px;
         }
       }
-      
-      .points-info {
+
+      .stamp-info {
         .label {
           font-size: 14px;
           color: rgba(255, 255, 255, 0.9);
           display: block;
-          margin-bottom: 5px;
+          margin-bottom: 4px;
         }
-        
-        .num {
-          font-size: 36px;
-          font-weight: bold;
-          color: #fff;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        .num-row {
+          display: flex;
+          align-items: baseline;
+
+          .num {
+            font-size: 40px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
+
+          .total {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-left: 6px;
+          }
         }
       }
+    }
+
+    .progress-bar {
+      position: relative;
+      z-index: 1;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 10px;
+
+      .progress-inner {
+        height: 100%;
+        background: #fff;
+        border-radius: 4px;
+        transition: width 0.5s;
+      }
+    }
+
+    .progress-text {
+      position: relative;
+      z-index: 1;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.85);
     }
   }
 }
@@ -290,30 +330,31 @@ onShow(() => {
 // 区域标题
 .section {
   padding: 0 15px;
-  
+  margin-top: 6px;
+
   .section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 15px;
     padding: 0 5px;
-    
+
     .section-title {
       display: flex;
       align-items: center;
-      
+
       .title-icon {
         font-size: 20px;
         margin-right: 8px;
       }
-      
+
       .title-text {
         font-size: 18px;
         font-weight: bold;
         color: #333;
       }
     }
-    
+
     .section-desc {
       font-size: 12px;
       color: #999;
@@ -321,195 +362,205 @@ onShow(() => {
   }
 }
 
-// 商品网格
-.product-grid {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0 -6px;
-}
-
-.product-card {
-  position: relative;
-  width: calc(50% - 12px);
-  margin: 6px;
+// 系列列表
+.series-list {
   background: #fff;
   border-radius: 16px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 4px 14px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-  
-  &:active {
-    transform: scale(0.98);
+}
+
+.series-item {
+  border-bottom: 1px solid #f5f5f5;
+
+  &:last-child {
+    border-bottom: none;
   }
-  
-  &.owned {
-    .badge-box {
-      opacity: 0.7;
-    }
-  }
-  
-  &.disabled:not(.owned) {
-    .badge-box {
-      filter: grayscale(0.5);
-    }
-  }
-  
-  // 已拥有角标
-  .owned-badge {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: linear-gradient(135deg, #52c41a, #73d13d);
-    border-radius: 0 16px 0 12px;
-    padding: 4px 10px;
-    
-    .owned-text {
-      font-size: 10px;
-      color: #fff;
-      font-weight: bold;
-    }
-  }
-  
-  // 勋章图标
-  .badge-box {
-    position: relative;
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
+
+  .series-head {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-    flex-shrink: 0;
-    overflow: hidden;
-    
-    .badge-img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    }
-    
-    .shine {
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        45deg,
-        transparent 40%,
-        rgba(255, 255, 255, 0.4) 50%,
-        transparent 60%
-      );
-      animation: shine 2.5s infinite;
-      pointer-events: none;
-    }
-  }
-  
-  // 商品信息
-  .product-info {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 10px;
-    overflow: hidden;
-    
-    .name {
-      font-size: 14px;
-      font-weight: bold;
-      color: #333;
-      display: block;
-      margin-bottom: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .desc {
-      font-size: 11px;
-      color: #999;
-      display: block;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-  
-  // 底部价格和按钮
-  .product-footer {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    
-    .price-box {
-      display: flex;
-      align-items: center;
-      
-      .price-icon {
+    padding: 14px 0;
+
+    .series-info {
+      flex: 1;
+      min-width: 0;
+
+      .series-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .series-province {
         font-size: 12px;
-        margin-right: 2px;
-      }
-      
-      .price-num {
-        font-size: 16px;
-        font-weight: bold;
-        color: #ff6b6b;
-      }
-    }
-    
-    .redeem-btn {
-      margin: 0;
-      padding: 0 10px;
-      min-width: 60px;
-      height: 28px;
-      line-height: 28px;
-      font-size: 11px;
-      border-radius: 14px;
-      border: none;
-      font-weight: 500;
-      transition: all 0.3s;
-      white-space: nowrap;
-      
-      &::after {
-        border: none;
-      }
-      
-      &.btn-owned {
-        background: #f0f0f0;
         color: #999;
       }
-      
-      &.btn-can {
-        background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-        
-        &:active {
-          transform: scale(0.95);
-          box-shadow: 0 2px 6px rgba(255, 107, 107, 0.2);
+    }
+
+    .series-right {
+      display: flex;
+      align-items: center;
+
+      .series-bar {
+        width: 70px;
+        height: 6px;
+        background: #f0f0f0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-right: 10px;
+
+        .series-bar-inner {
+          height: 100%;
+          background: linear-gradient(90deg, #667eea, #764ba2);
+          border-radius: 3px;
         }
       }
-      
-      &.btn-cant {
-        background: #f5f5f5;
+
+      .series-done {
+        font-size: 11px;
+        color: #4caf50;
+        font-weight: bold;
+        margin-right: 8px;
+      }
+
+      .series-arrow {
+        font-size: 18px;
+        color: #ccc;
+        transition: transform 0.2s;
+
+        &.open {
+          transform: rotate(90deg);
+        }
+      }
+    }
+  }
+
+  .series-detail {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 4px 14px;
+
+    .stamp-cell {
+      width: 25%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 14px;
+
+      .stamp-seal {
+        position: relative;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        border: 2px dashed #ddd;
+        background: #fafafa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 6px;
+
+        .seal-emoji {
+          font-size: 24px;
+        }
+
+        .seal-check {
+          position: absolute;
+          bottom: -4px;
+          right: -4px;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: #4caf50;
+          color: #fff;
+          font-size: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+
+      &.done {
+        .stamp-seal {
+          border: 2px solid #667eea;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          box-shadow: 0 4px 10px rgba(102, 126, 234, 0.35);
+
+          .seal-emoji {
+            filter: brightness(0) invert(1);
+            opacity: 0.9;
+          }
+        }
+
+        .stamp-name {
+          color: #333;
+          font-weight: 600;
+        }
+      }
+
+      .stamp-name {
+        font-size: 11px;
         color: #bbb;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 90%;
       }
     }
   }
 }
 
-// 闪光动画
-@keyframes shine {
-  0% {
-    transform: translateX(-100%) rotate(45deg);
-  }
-  100% {
-    transform: translateX(100%) rotate(45deg);
+// 最近收集时间线
+.stamp-timeline {
+  background: #fff;
+  border-radius: 16px;
+  padding: 6px 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+
+  .timeline-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f7f7f7;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .timeline-seal {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      flex-shrink: 0;
+
+      .seal-emoji {
+        font-size: 20px;
+        filter: brightness(0) invert(1);
+      }
+    }
+
+    .timeline-info {
+      .timeline-name {
+        font-size: 15px;
+        font-weight: 500;
+        color: #333;
+        display: block;
+        margin-bottom: 3px;
+      }
+
+      .timeline-time {
+        font-size: 12px;
+        color: #999;
+      }
+    }
   }
 }
 
@@ -519,18 +570,37 @@ onShow(() => {
   flex-direction: column;
   align-items: center;
   padding: 60px 0;
-  
+
   .empty-icon {
     font-size: 60px;
     margin-bottom: 10px;
     opacity: 0.5;
   }
-  
+
   .empty-text {
-    font-size: 14px;
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 6px;
+  }
+
+  .empty-tip {
+    font-size: 12px;
     color: #999;
+    margin-bottom: 20px;
+  }
+
+  .empty-btn {
+    height: 40px;
+    line-height: 40px;
+    padding: 0 40px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    font-size: 14px;
+    border-radius: 20px;
+
+    &::after {
+      border: none;
+    }
   }
 }
-
-
 </style>

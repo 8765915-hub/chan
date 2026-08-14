@@ -2,12 +2,12 @@
   <view class="container">
     <!-- 导入示例内容栏（管理员专用） -->
     <view class="import-bar">
-      <button size="mini" type="primary" class="import-btn" @click="importSeed">导入示例内容</button>
+      <button size="mini" type="primary" class="import-btn" @click="importSeed">导入示例打卡</button>
     </view>
     <view class="list" v-if="list.length > 0">
       <view class="item" v-for="(item, index) in list" :key="index">
         <view class="header-row">
-          <view class="type-tag" :class="item.type">{{ getTypeLabel(item.type) }}</view>
+          <view class="type-tag" :class="item.type">{{ getTypeLabel(item.type, item) }}</view>
           <view class="status-tag" :class="getStatusClass(item.status)">{{ getStatusText(item.status) }}</view>
         </view>
         
@@ -61,6 +61,9 @@
           <block v-if="item.status === '0'">
             <button size="mini" type="default" class="btn reject" @click="handleAudit(item, '2')">驳回</button>
             <button size="mini" type="primary" class="btn approve" @click="handleAudit(item, '1')">通过(+{{ getTypePoints(item.type) }}分)</button>
+          </block>
+          <block v-else>
+            <button size="mini" type="warn" class="btn delete" @click="handleDelete(item)">删除</button>
           </block>
         </view>
       </view>
@@ -121,11 +124,13 @@ const importSeed = async () => {
   }
 }
 
-const getTypeLabel = (type) => {
+const getTypeLabel = (type, item) => {
+  if (item && item.spotName) return item.spotName
   const map = {
     'beauty': '城市美景',
     'behavior': '文明行为',
-    'public': '公益行动'
+    'public': '公益行动',
+    'spot': '打卡集章'
   }
   return map[type] || '其他'
 }
@@ -134,7 +139,8 @@ const getTypePoints = (type) => {
   const map = {
     'beauty': 10,
     'behavior': 15,
-    'public': 20
+    'public': 20,
+    'spot': 20
   }
   return map[type] || 10
 }
@@ -216,7 +222,10 @@ const handleAudit = (item, status) => {
 const handleDelete = (item) => {
   uni.showModal({
     title: '删除确认',
-    content: '确定要永久删除这条记录吗？',
+    content: item.status === '1'
+      ? '确定要永久删除这条已通过的记录吗？删除后将同步扣回该用户获得的积分与印章，且不可恢复。'
+      : '确定要永久删除这条记录吗？删除后不可恢复。',
+    confirmColor: '#e64340',
     success: async (res) => {
       if (res.confirm) {
         try {

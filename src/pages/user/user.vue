@@ -60,7 +60,7 @@
           <view class="icon-wrap icon-shop">
             <view class="icon-gift"></view>
           </view>
-          <text class="item-name">积分兑换</text>
+          <text class="item-name">我的印章</text>
           <view class="arrow-right"></view>
         </view>
         
@@ -68,7 +68,7 @@
           <view class="icon-wrap icon-history">
             <view class="icon-file"></view>
           </view>
-          <text class="item-name">我的上报</text>
+          <text class="item-name">我的打卡</text>
           <view class="arrow-right"></view>
         </view>
       </view>
