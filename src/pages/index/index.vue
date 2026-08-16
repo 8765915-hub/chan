@@ -92,7 +92,7 @@
         <text class="collect-text">/ {{ spots.length }} 枚印章已收集，集齐省级系列可解锁徽章</text>
       </view>
       <view class="collect-info" v-else>
-        <text class="collect-text">登录后开始收集属于你的城市印章</text>
+        <text class="collect-text">登录后开始收集属于你的专属印章</text>
       </view>
       <button class="scoop-btn" hover-class="btn-hover" @click="goToReport">
         <text class="btn-text">去打卡</text>
@@ -280,7 +280,7 @@ const haversineKm = (lat1, lng1, lat2, lng2) => {
 
 onShareAppMessage((res) => {
   return {
-    title: '城市印章 - 打卡城市地标，集齐专属印章',
+    title: '城市微光 - 打卡城市地标，集齐专属印章',
     path: '/pages/index/index',
     imageUrl: '/static/logo.png'
   }
@@ -288,7 +288,7 @@ onShareAppMessage((res) => {
 
 onShareTimeline((res) => {
   return {
-    title: '城市印章 - 打卡城市地标，集齐专属印章',
+    title: '城市微光 - 打卡城市地标，集齐专属印章',
     query: ''
   }
 })

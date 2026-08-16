@@ -774,7 +774,7 @@ async function handleAdminListReport(data, openid) {
 }
 
 // 导入示例打卡内容（仅管理员）
-// 示例为「城市印章」新玩法的打卡动态（带 seedKey 去重，可重复调用；导入 v2 时会自动清理旧版 v1 示例）
+// 示例为「城市微光」新玩法的打卡动态（带 seedKey 去重，可重复调用；导入 v2 时会自动清理旧版 v1 示例）
 async function handleSeedContent(data, openid) {
   // 1. 管理员权限校验：非管理员禁止导入
   const isAdmin = await checkAdmin(openid)

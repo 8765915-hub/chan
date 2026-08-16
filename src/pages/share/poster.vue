@@ -129,7 +129,7 @@ const drawTexts = (ctx) => {
   ctx.setFontSize(14)
   ctx.setFillStyle('rgba(255,255,255,0.9)')
   ctx.setTextAlign('center')
-  ctx.fillText('城市印章 · 打卡城市地标，集齐专属印章', canvasW / 2, 416)
+  ctx.fillText('城市微光 · 打卡城市地标，集齐专属印章', canvasW / 2, 416)
 }
 
 const savePoster = () => {
@@ -168,7 +168,7 @@ const savePoster = () => {
 
 onShareAppMessage(() => {
   return {
-    title: `我在「城市印章」点亮了「${shareData.value.spotName || '城市地标'}」的印章，一起来集章吧！`,
+    title: `我在「城市微光」点亮了「${shareData.value.spotName || '城市地标'}」的印章，一起来集章吧！`,
     path: '/pages/index/index',
     imageUrl: shareData.value.image || '/static/logo.png'
   }

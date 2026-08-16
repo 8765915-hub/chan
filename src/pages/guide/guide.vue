@@ -11,7 +11,7 @@
       <swiper-item class="guide-item">
         <view class="slide-content">
           <view class="hero-icon">📸</view>
-          <view class="hero-title">城市印章</view>
+          <view class="hero-title">城市微光</view>
           <view class="hero-subtitle">打卡城市地标，集齐专属印章，点亮你的足迹地图</view>
         </view>
       </swiper-item>
@@ -20,7 +20,7 @@
       <swiper-item class="guide-item">
         <view class="slide-content">
           <view class="section-title">三步上手</view>
-          <view class="section-subtitle">轻松集齐城市印章</view>
+          <view class="section-subtitle">轻松集齐专属印章</view>
 
           <view class="step-card">
             <view class="step-num">1</view>
@@ -55,7 +55,7 @@
         <view class="slide-content">
           <view class="hero-icon">✨</view>
           <view class="hero-title">准备好了吗？</view>
-          <view class="hero-subtitle">一起点亮城市印章</view>
+          <view class="hero-subtitle">一起点亮专属印章</view>
           <view class="start-btn" hover-class="btn-hover" @click="handleStart">开始使用</view>
         </view>
       </swiper-item>

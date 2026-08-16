@@ -258,14 +258,14 @@ onShareAppMessage((res) => {
     }
   }
   return {
-    title: '城市印章 - 大家都在打卡',
+    title: '城市微光 - 大家都在打卡',
     path: '/pages/feed/feed'
   }
 })
 
 onShareTimeline(() => {
   return {
-    title: '城市印章 - 大家都在打卡',
+    title: '城市微光 - 大家都在打卡',
     query: ''
   }
 })

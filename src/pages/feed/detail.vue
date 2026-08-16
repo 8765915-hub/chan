@@ -11,7 +11,7 @@
       </view>
 
       <view class="content">
-        <text class="desc">{{ detail.description || '在这里点亮了一枚城市印章...' }}</text>
+        <text class="desc">{{ detail.description || '在这里点亮了一枚专属印章...' }}</text>
       </view>
 
       <view class="media-area" v-if="getMediaList(detail).length > 0">
@@ -239,7 +239,7 @@ onShareAppMessage((res) => {
   console.log('Original Image URL:', imageUrl)
   
   // 生成分享标题
-  let title = '城市印章 - 打卡现场'
+  let title = '城市微光 - 打卡现场'
   if (detail.value.description) {
     const desc = detail.value.description.substring(0, 30)
     title = `${desc}${detail.value.description.length > 30 ? '...' : ''}`

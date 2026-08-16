@@ -2,7 +2,7 @@ import { onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
 
 export function useGlobalShare(options = {}) {
   const defaultShare = {
-    title: '城市印章 - 打卡城市地标，集齐专属印章',
+    title: '城市微光 - 打卡城市地标，集齐专属印章',
     path: '/pages/index/index',
     imageUrl: '/static/logo.png',
     ...options

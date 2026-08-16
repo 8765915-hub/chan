@@ -3,7 +3,7 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "城市印章"
+				"navigationBarTitleText": "城市微光"
 			}
 		},
 		{
@@ -94,7 +94,7 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "城市印章",
+		"navigationBarTitleText": "城市微光",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
 	},
