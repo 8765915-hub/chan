@@ -48,18 +48,19 @@ export const uploadFile = (filePath) => {
       cloudPath: cloudPath,
       filePath: filePath,
       success: (res) => {
+        const fileID = res.fileID
         // Get temp file URL for immediate display/use
         wx.cloud.getTempFileURL({
-          fileList: [res.fileID],
+          fileList: [fileID],
           success: tempRes => {
             if (tempRes.fileList && tempRes.fileList[0].tempFileURL) {
-               resolve(tempRes.fileList[0].tempFileURL)
+               resolve({ url: tempRes.fileList[0].tempFileURL, fileID })
             } else {
-               resolve(res.fileID) // Fallback to fileID
+               resolve({ url: fileID, fileID }) // Fallback to fileID
             }
           },
           fail: () => {
-             resolve(res.fileID)
+             resolve({ url: fileID, fileID })
           }
         })
       },

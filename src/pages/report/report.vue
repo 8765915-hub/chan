@@ -347,6 +347,7 @@ const submitCheckin = async () => {
       try {
         let filePath = item.path
         if (item.type === 'image') {
+          // 压缩到 1MB 以内，既省云存储空间，也满足 imgSecCheck ≤1MB 限制
           const fs = uni.getFileSystemManager()
           const fileInfo = await new Promise((resolve, reject) => {
             fs.getFileInfo({ filePath, success: resolve, fail: reject })
@@ -357,18 +358,22 @@ const submitCheckin = async () => {
             })
             filePath = compressRes.tempFilePath
           }
-          const base64 = fs.readFileSync(filePath, 'base64')
+        }
+        // 先上传拿到 fileID，再用 fileID 走云函数审核（避免 base64 触发 callFunction 的 data 大小上限）
+        const { url, fileID } = await uploadFile(filePath)
+        if (item.type === 'image') {
           const checkRes = await wx.cloud.callFunction({
             name: 'checkContent',
-            data: { type: 'image', imageBase64: base64 }
+            data: { type: 'image', content: fileID }
           })
           if (checkRes.result.code !== 200) {
+            // 审核不通过，清理已上传的文件
+            wx.cloud.deleteFile({ fileList: [fileID] })
             uni.showToast({ title: '图片包含违规内容', icon: 'none' })
             submitting.value = false
             return
           }
         }
-        const url = await uploadFile(filePath)
         uploadedFiles.push({ type: item.type, url })
       } catch (e) {
         console.error('Upload or check failed', e)
