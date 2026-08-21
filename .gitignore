@@ -3,10 +3,11 @@ dist
 unpackage
 .hbuilder
 .hbuilderx
+.trae
+project.private.config.json
 .DS_Store
 *.local
 .idea
 .vscode
 *.log
-package-lock.json
 yarn.lock
