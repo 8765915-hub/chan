@@ -12,7 +12,7 @@
         <view class="slide-content">
           <view class="hero-icon">📸</view>
           <view class="hero-title">城市微光</view>
-          <view class="hero-subtitle">用镜头记录城市温度，让每一份美好被看见</view>
+          <view class="hero-subtitle">打卡城市地标，集齐专属印章，点亮你的足迹地图</view>
         </view>
       </swiper-item>
 
@@ -20,13 +20,13 @@
       <swiper-item class="guide-item">
         <view class="slide-content">
           <view class="section-title">三步上手</view>
-          <view class="section-subtitle">轻松记录城市美好</view>
+          <view class="section-subtitle">轻松集齐专属印章</view>
 
           <view class="step-card">
             <view class="step-num">1</view>
             <view class="step-info">
-              <view class="step-name">随手拍</view>
-              <view class="step-desc">记录美好瞬间</view>
+              <view class="step-name">发现打卡点</view>
+              <view class="step-desc">全国地标任你探索</view>
             </view>
           </view>
           <view class="step-arrow">↓</view>
@@ -34,8 +34,8 @@
           <view class="step-card">
             <view class="step-num">2</view>
             <view class="step-info">
-              <view class="step-name">等待审核</view>
-              <view class="step-desc">收获认可</view>
+              <view class="step-name">到点拍照</view>
+              <view class="step-desc">实地打卡更有仪式感</view>
             </view>
           </view>
           <view class="step-arrow">↓</view>
@@ -43,8 +43,8 @@
           <view class="step-card">
             <view class="step-num">3</view>
             <view class="step-info">
-              <view class="step-name">赚积分</view>
-              <view class="step-desc">兑换勋章荣誉</view>
+              <view class="step-name">集齐印章</view>
+              <view class="step-desc">解锁系列徽章与榜单</view>
             </view>
           </view>
         </view>
@@ -55,7 +55,7 @@
         <view class="slide-content">
           <view class="hero-icon">✨</view>
           <view class="hero-title">准备好了吗？</view>
-          <view class="hero-subtitle">一起点亮城市微光</view>
+          <view class="hero-subtitle">一起点亮专属印章</view>
           <view class="start-btn" hover-class="btn-hover" @click="handleStart">开始使用</view>
         </view>
       </swiper-item>
@@ -83,6 +83,13 @@ const statusBarHeight = ref(20)
 
 onMounted(() => {
   getStatusBarHeight()
+  // 引导页只要展示过一次就记录标记，避免每次打开小程序都出现
+  // （即使玩家未点"跳过/开始使用"直接退出，下次也不再展示）
+  try {
+    uni.setStorageSync('guide_seen', '1')
+  } catch (e) {
+    console.error('记录引导页状态失败:', e)
+  }
 })
 
 // 获取系统状态栏高度，保证"跳过"按钮不被刘海屏遮挡

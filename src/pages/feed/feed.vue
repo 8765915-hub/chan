@@ -60,7 +60,7 @@
               <text class="user-name">{{ item.nickName || '微信用户' }}</text>
               <text class="post-time">{{ formatDate(item.createTime) }}</text>
             </view>
-            <view class="type-tag" :class="item.type">{{ getTypeLabel(item.type) }}</view>
+            <view class="type-tag" :class="item.type">{{ getTypeLabel(item.type, item) }}</view>
           </view>
 
           <!-- 内容描述 -->
@@ -172,11 +172,13 @@ const getList = async () => {
   }
 }
 
-const getTypeLabel = (type) => {
+const getTypeLabel = (type, item) => {
+  if (item && item.spotName) return item.spotName
   const map = {
     'beauty': '城市美景',
     'behavior': '文明行为',
-    'public': '公益行动'
+    'public': '公益行动',
+    'spot': '打卡集章'
   }
   return map[type] || '其他'
 }
@@ -250,20 +252,20 @@ onShareAppMessage((res) => {
   if (res.from === 'button') {
     const item = res.target.dataset.item
     return {
-      title: item.description || `我发现了一个${getTypeLabel(item.type)}，快来看看！`,
+      title: item.description || `我发现了一个${getTypeLabel(item.type, item)}，快来看看！`,
       path: '/pages/feed/feed',
       imageUrl: getMediaList(item)[0]?.url || '/static/logo.png'
     }
   }
   return {
-    title: '城市微光 - 发现身边的美好',
+    title: '城市微光 - 大家都在打卡',
     path: '/pages/feed/feed'
   }
 })
 
 onShareTimeline(() => {
   return {
-    title: '城市微光 - 发现身边的美好',
+    title: '城市微光 - 大家都在打卡',
     query: ''
   }
 })

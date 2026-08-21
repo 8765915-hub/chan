@@ -7,11 +7,11 @@
           <text class="name">{{ detail.nickName || '微信用户' }}</text>
           <text class="time">{{ formatDate(detail.createTime) }}</text>
         </view>
-        <view class="tag" :class="detail.type">{{ getTypeLabel(detail.type) }}</view>
+        <view class="tag" :class="detail.type">{{ getTypeLabel(detail.type, detail) }}</view>
       </view>
 
       <view class="content">
-        <text class="desc">{{ detail.description || '发现一处文明微光...' }}</text>
+        <text class="desc">{{ detail.description || '在这里点亮了一枚专属印章...' }}</text>
       </view>
 
       <view class="media-area" v-if="getMediaList(detail).length > 0">
@@ -204,11 +204,13 @@ const previewImage = (item, current) => {
   }
 }
 
-const getTypeLabel = (type) => {
+const getTypeLabel = (type, item) => {
+  if (item && item.spotName) return item.spotName
   const map = {
     'beauty': '城市美景',
     'behavior': '文明行为',
-    'public': '公益行动'
+    'public': '公益行动',
+    'spot': '打卡集章'
   }
   return map[type] || '其他'
 }
@@ -237,7 +239,7 @@ onShareAppMessage((res) => {
   console.log('Original Image URL:', imageUrl)
   
   // 生成分享标题
-  let title = '城市微光 - 发现身边的美好'
+  let title = '城市微光 - 打卡现场'
   if (detail.value.description) {
     const desc = detail.value.description.substring(0, 30)
     title = `${desc}${detail.value.description.length > 30 ? '...' : ''}`

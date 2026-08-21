@@ -60,7 +60,7 @@
           <view class="icon-wrap icon-shop">
             <view class="icon-gift"></view>
           </view>
-          <text class="item-name">积分兑换</text>
+          <text class="item-name">我的印章</text>
           <view class="arrow-right"></view>
         </view>
         
@@ -68,7 +68,7 @@
           <view class="icon-wrap icon-history">
             <view class="icon-file"></view>
           </view>
-          <text class="item-name">我的上报</text>
+          <text class="item-name">我的打卡</text>
           <view class="arrow-right"></view>
         </view>
       </view>
@@ -181,31 +181,33 @@ const changeAvatar = () => {
         const fileInfo = await new Promise((resolve, reject) => {
           fs.getFileInfo({ filePath: checkPath, success: resolve, fail: reject })
         })
-        
+
         if (fileInfo.size > 1024 * 1024) {
           const compressRes = await new Promise((resolve, reject) => {
             uni.compressImage({ src: checkPath, quality: 60, success: resolve, fail: reject })
           })
           checkPath = compressRes.tempFilePath
         }
-        
-        const base64 = fs.readFileSync(checkPath, 'base64')
-        
+
+        // 先上传拿到 fileID，再用 fileID 走云函数审核（避免 base64 触发 callFunction 的 data 大小上限）
+        uni.showLoading({ title: '上传中...' })
+        const { url, fileID } = await uploadFile(checkPath)
+
         const checkRes = await wx.cloud.callFunction({
           name: 'checkContent',
-          data: { type: 'image', imageBase64: base64 }
+          data: { type: 'image', content: fileID }
         })
-        
+
         if (checkRes.result.code !== 200) {
+          // 审核不通过，清理已上传的文件
+          wx.cloud.deleteFile({ fileList: [fileID] })
           uni.hideLoading()
           uni.showToast({ title: '头像包含违规内容', icon: 'none' })
           return
         }
-        
-        uni.showLoading({ title: '上传中...' })
-        const url = await uploadFile(filePath)
+
         updateUserInfo({ avatarUrl: url })
-        
+
       } catch (e) {
         uni.hideLoading()
         uni.showToast({ title: '操作失败', icon: 'none' })
